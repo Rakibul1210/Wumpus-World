@@ -1,15 +1,29 @@
+const pitDanger = 2000;
+const wumpusDanger = 400;
+
 class Board {
     constructor(gridSize, numberOfPits, numberOfGold, numberOfWumpus) {
         this.gridSize = gridSize;
         this.grid = new Array(gridSize);
         this.currentRow = 0;
         this.currentCol = 0;
+        this.arrow = 1;
+
 
         for (let i = 0; i < gridSize; i++) {
-            this.grid[i] = new Array(gridSize).fill('');
+            this.grid[i] = new Array(gridSize).fill("");
         }
 
+        this.visitedRooms = new Array(gridSize)
+            .fill(null)
+            .map(() => new Array(10).fill(false));
+        this.dangerPerRoom = new Array(gridSize)
+            .fill(null)
+            .map(() => new Array(this.gridSize).fill(0));
 
+        this.adjacentRooms = new Array();
+        this.possibelPits = new Array();
+        this.possibleWumpus = new Array();
 
         this.placePits(numberOfPits);
         this.placeGold(numberOfGold);
@@ -19,125 +33,98 @@ class Board {
 
         this.addBreeze();
         this.addStench();
-
     }
 
     moveLeft() {
-
         if (this.isValidCoordinate(this.currentRow, this.currentCol - 1)) {
 
 
-            this.grid[this.currentRow][this.currentCol] = this.grid[this.currentRow][this.currentCol].slice(0, -1);
-            this.currentCol -= 1;
-            this.grid[this.currentRow][this.currentCol] += 'A';
+
+            // this.grid[this.currentRow][this.currentCol] = this.grid[this.currentRow][this.currentCol].slice(0, -1);
+            // this.currentCol -= 1;
+            // this.grid[this.currentRow][this.currentCol] += "A";
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
     moveRight() {
-
         if (this.isValidCoordinate(this.currentRow, this.currentCol + 1)) {
-
-
-            this.grid[this.currentRow][this.currentCol] = this.grid[this.currentRow][this.currentCol].slice(0, -1);
+            this.grid[this.currentRow][this.currentCol] = this.grid[this.currentRow][
+                this.currentCol
+            ].slice(0, -1);
             this.currentCol += 1;
-            this.grid[this.currentRow][this.currentCol] += 'A';
+            this.grid[this.currentRow][this.currentCol] += "A";
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
     moveUp() {
-
         if (this.isValidCoordinate(this.currentRow - 1, this.currentCol)) {
-
-
-            this.grid[this.currentRow][this.currentCol] = this.grid[this.currentRow][this.currentCol].slice(0, -1);
+            this.grid[this.currentRow][this.currentCol] = this.grid[this.currentRow][
+                this.currentCol
+            ].slice(0, -1);
             this.currentRow -= 1;
-            this.grid[this.currentRow][this.currentCol] += 'A';
+            this.grid[this.currentRow][this.currentCol] += "A";
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
     moveDown() {
-
         if (this.isValidCoordinate(this.currentRow + 1, this.currentCol)) {
-
-
-            this.grid[this.currentRow][this.currentCol] = this.grid[this.currentRow][this.currentCol].slice(0, -1);
+            this.grid[this.currentRow][this.currentCol] = this.grid[this.currentRow][
+                this.currentCol
+            ].slice(0, -1);
             this.currentRow += 1;
-            this.grid[this.currentRow][this.currentCol] += 'A';
+            this.grid[this.currentRow][this.currentCol] += "A";
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
-
-
     addBreeze() {
-        console.log('addBreeze');
+        console.log("addBreeze");
         for (let i = 0; i < this.gridSize; i++) {
             for (let j = 0; j < this.gridSize; j++) {
                 if (this.grid[i][j] == "P") {
                     if (this.isValidCoordinate(i - 1, j)) {
                         if (this.grid[i - 1][j] === "") {
-                            this.grid[i - 1][j] = 'B';
-
+                            this.grid[i - 1][j] = "B";
+                        } else if (this.grid[i - 1][j] === "G") {
+                            this.grid[i - 1][j] += "B";
                         }
-                        else if (this.grid[i - 1][j] === "G") {
-                            this.grid[i - 1][j] += 'B';
-                        }
-
                     }
-
                     if (this.isValidCoordinate(i, j - 1)) {
-
                         if (this.grid[i][j - 1] === "") {
-                            this.grid[i][j - 1] = 'B';
-
-                        }
-                        else if (this.grid[i][j - 1] === "G") {
-                            this.grid[i][j - 1] += 'B';
+                            this.grid[i][j - 1] = "B";
+                        } else if (this.grid[i][j - 1] === "G") {
+                            this.grid[i][j - 1] += "B";
                         }
                     }
                     if (this.isValidCoordinate(i, j + 1)) {
                         if (this.grid[i][j + 1] === "") {
-                            this.grid[i][j + 1] = 'B';
-
-                        }
-                        else if (this.grid[i][j + 1] === "G") {
-                            this.grid[i][j + 1] += 'B';
+                            this.grid[i][j + 1] = "B";
+                        } else if (this.grid[i][j + 1] === "G") {
+                            this.grid[i][j + 1] += "B";
                         }
                     }
                     if (this.isValidCoordinate(i + 1, j)) {
                         if (this.grid[i + 1][j] === "") {
-                            this.grid[i + 1][j] = 'B';
-
-                        }
-                        else if (this.grid[i + 1][j] === "G") {
-                            this.grid[i + 1][j] += 'B';
+                            this.grid[i + 1][j] = "B";
+                        } else if (this.grid[i + 1][j] === "G") {
+                            this.grid[i + 1][j] += "B";
                         }
                     }
-
-
                 }
-
             }
-
         }
-
     }
-
 
     addStench() {
         for (let i = 0; i < this.gridSize; i++) {
@@ -145,51 +132,52 @@ class Board {
                 if (this.grid[i][j] == "W") {
                     if (this.isValidCoordinate(i - 1, j)) {
                         if (this.grid[i - 1][j] === "") {
-                            this.grid[i - 1][j] = 'S';
-
+                            this.grid[i - 1][j] = "S";
+                        } else if (
+                            this.grid[i - 1][j] === "G" ||
+                            this.grid[i - 1][j] === "B" ||
+                            this.grid[i - 1][j] === "GB"
+                        ) {
+                            this.grid[i - 1][j] += "B";
                         }
-                        else if (this.grid[i - 1][j] === "G" || this.grid[i - 1][j] === "B" || this.grid[i - 1][j] === "GB") {
-                            this.grid[i - 1][j] += 'B';
-                        }
-
                     }
 
                     if (this.isValidCoordinate(i, j - 1)) {
-
                         if (this.grid[i][j - 1] === "") {
-                            this.grid[i][j - 1] = 'S';
-
-                        }
-                        else if (this.grid[i][j - 1] === "G" || this.grid[i][j - 1] === "B" || this.grid[i][j - 1] === "GB") {
-                            this.grid[i][j - 1] += 'S';
+                            this.grid[i][j - 1] = "S";
+                        } else if (
+                            this.grid[i][j - 1] === "G" ||
+                            this.grid[i][j - 1] === "B" ||
+                            this.grid[i][j - 1] === "GB"
+                        ) {
+                            this.grid[i][j - 1] += "S";
                         }
                     }
                     if (this.isValidCoordinate(i, j + 1)) {
                         if (this.grid[i][j + 1] === "") {
-                            this.grid[i][j + 1] = 'S';
-
-                        }
-                        else if (this.grid[i][j + 1] === "G" || this.grid[i][j + 1] === "B" || this.grid[i][j + 1] === "GB") {
-                            this.grid[i][j + 1] += 'S';
+                            this.grid[i][j + 1] = "S";
+                        } else if (
+                            this.grid[i][j + 1] === "G" ||
+                            this.grid[i][j + 1] === "B" ||
+                            this.grid[i][j + 1] === "GB"
+                        ) {
+                            this.grid[i][j + 1] += "S";
                         }
                     }
                     if (this.isValidCoordinate(i + 1, j)) {
                         if (this.grid[i + 1][j] === "") {
-                            this.grid[i + 1][j] = 'S';
-
-                        }
-                        else if (this.grid[i + 1][j] === "G" || this.grid[i + 1][j] === "B" || this.grid[i + 1][j] === "GB") {
-                            this.grid[i + 1][j] += 'S';
+                            this.grid[i + 1][j] = "S";
+                        } else if (
+                            this.grid[i + 1][j] === "G" ||
+                            this.grid[i + 1][j] === "B" ||
+                            this.grid[i + 1][j] === "GB"
+                        ) {
+                            this.grid[i + 1][j] += "S";
                         }
                     }
-
-
                 }
-
             }
-
         }
-
     }
 
     // generateRandomEnvironment(numberOfPits, numberOfGold, hasWumpus) {
@@ -213,7 +201,7 @@ class Board {
         if (this.isValidCoordinate(x, y)) {
             return this.grid[x][y];
         }
-        return 'invalid';
+        return "invalid";
     }
 
     isValidCoordinate(x, y) {
@@ -228,7 +216,7 @@ class Board {
                 i--;
                 continue;
             }
-            this.setCell(x, y, 'P');
+            this.setCell(x, y, "P");
         }
     }
 
@@ -236,7 +224,7 @@ class Board {
         for (let i = 0; i < numberOfGold; i++) {
             const x = Math.floor(Math.random() * this.gridSize);
             const y = Math.floor(Math.random() * this.gridSize);
-            this.setCell(x, y, 'G');
+            this.setCell(x, y, "G");
         }
     }
 
@@ -244,39 +232,123 @@ class Board {
         for (let i = 0; i < numberOfPits; i++) {
             const x = Math.floor(Math.random() * this.gridSize);
             const y = Math.floor(Math.random() * this.gridSize);
-            this.setCell(x, y, 'W');
+            this.setCell(x, y, "W");
         }
     }
 
     placeAgent(x, y) {
-        this.setCell(x, y, 'A');
+        this.setCell(x, y, "A");
+        this.visitedRooms[x][y] = true;
+        if (this.isValidCoordinate(x - 1, y) && this.visitedRooms[x - 1][y] == false)
+            this.adjacentRooms.push([0, x - 1, y]);
+        if (this.isValidCoordinate(x, y - 1) && this.visitedRooms[x][y - 1] === false) {
+            this.adjacentRooms.push([0, x, y - 1]);
+        }
+        if (this.isValidCoordinate(x + 1, y) && this.visitedRooms[x + 1][y] === false) {
+            this.adjacentRooms.push([0, x + 1, y]);
+        }
+        if (this.isValidCoordinate(x, y + 1) && this.visitedRooms[x][y + 1] === false) {
+            this.adjacentRooms.push([0, x, y + 1]);
+        }
+
+
     }
 
     display() {
         for (let x = 0; x < this.gridSize; x++) {
-            let row = '';
+            let row = "";
 
             for (let y = 0; y < this.gridSize; y++) {
                 let cellContent = this.getCell(x, y);
-                if (cellContent === '') {
-                    cellContent = '-';
+                if (cellContent === "") {
+                    cellContent = "-";
                 }
-                row += cellContent + '\t';
+                row += cellContent + "\t";
             }
 
             console.log(row);
         }
     }
 
+    findBestMove() {
+
+        for (let i = 0; i < this.adjacentRooms.length; i++) {
+            breeze = 0;
+            stench = 0;
+            bs = 0;
+            x = this.adjacentRooms[i].x;
+            y = this.adjacentRooms[i].y;
+
+            if (this.isValidCoordinate(x - 1, y) && this.visitedRooms(x - 1, y)) {  //left
+                if (this.grid[x - 1][y].includes("BS")) {
+                    bs += 1;
+                } else if (this.grid[x - 1][y].includes("B")) {
+                    breeze += 1;
+                } else if (this.grid[x - 1][y].includes("S")) {
+                    stench += 1;
+                }
+            }
+
+            if (this.isValidCoordinate(x, y - 1) && this.visitedRooms(x, y - 1)) {  //up
+                if (this.grid[x][y - 1].includes("BS")) {
+                    bs += 1;
+                } else if (this.grid[x][y - 1].includes("B")) {
+                    breeze += 1;
+                } else if (this.grid[x][y - 1].includes("S")) {
+                    stench += 1;
+                }
+            }
+            if (this.isValidCoordinate(x + 1, y) && this.visitedRooms(x + 1, y)) {  //right
+                if (this.grid[x + 1][y].includes("BS")) {
+                    bs += 1;
+                } else if (this.grid[x + 1][y].includes("B")) {
+                    breeze += 1;
+                } else if (this.grid[x + 1][y].includes("S")) {
+                    stench += 1;
+                }
+            }
+            if (this.isValidCoordinate(x, y + 1) && this.visitedRooms(x, y + 1)) {  //down
+                if (this.grid[x][y + 1].includes("BS")) {
+                    bs += 1;
+                } else if (this.grid[x][y + 1].includes("B")) {
+                    breeze += 1;
+                } else if (this.grid[x][y + 1].includes("S")) {
+                    stench += 1;
+                }
+            }
+
+            // TODO:  Calculate Danger according to the number of breeze and stench values.............................
+
+            if (breeze && stench) {
+                danger = 0;
+            }
+            else if (breeze) {
+                danger = pitDanger * (breeze + bs);
+            }
+            else if (stench) {
+                if (arrow)
+                    danger = wumpusDanger * (stench + bs);
+                else
+                    danger = pitDanger * (stench + bs);
+            }
+            else if (bs) {
+                danger += pitDanger * bs;
+            }
+
+            this.adjacentRooms[i][j][2] = danger;
+        }
+
+        this.adjacentRooms.sort((a, b) => b[2] - a[2]);
+
+        const safestMove = [];
+        safestMove[0] = this.adjacentRooms[0][0][0];
+        safestMove[1] = this.adjacentRooms[0][0][1];
+
+
+        console.log("safestMove: " + safestMove);
+
+
+    }
 }
-
-// Example usage:
-// const gridSize = 10; // Specify the grid size
-// const numberOfPits = 20; // Specify the number of pits
-// const numberOfGold = 3; // Specify the number of gold items
-// const hasWumpus = true; // Specify whether the Wumpus is present
-// const board = new Board(gridSize, numberOfPits, numberOfGold, hasWumpus);
-// board.display(); // Display the current state of the board
-
 
 module.exports = Board;
