@@ -11,12 +11,12 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<WumpusSetup />} />
-        <Route path={`/WumpusGameBoard/:numPitsInitialValue/:numGoldsInitialValue/:numWumpusInitialValue`} element={<WumpusGameBoard />} />
-        <Route path={'/WumpusGameBoard'} element={<WumpusGameBoard />} />
+        <Route path="/" element={<WumpusSetup />} /> 
+        {/* <Route path={`/WumpusGameBoard/:numPitsInitialValue/:numGoldsInitialValue/:numWumpusInitialValue`} element={<WumpusGameBoard />}/> */}
+        <Route path={'/WumpusGameBoard'} element={<WumpusGameBoard />}/>
 
       </Routes>
-    </Router>
+      </Router>
   );
 }
 
