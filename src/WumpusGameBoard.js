@@ -4,6 +4,7 @@ import { Table, Button } from 'react-bootstrap';
 import './WumpusGameBoard.css'; // Import your CSS file
 import { FaBolt, FaSkull, FaCoins, FaUser } from 'react-icons/fa';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import axios from 'axios';
 
 const WumpusGameBoard = () => {
@@ -12,6 +13,7 @@ const WumpusGameBoard = () => {
   // const { numPitsInitialValue, numGoldsInitialValue, numWumpusInitialValue } = useParams();
   // const initialBoard = useParams()
   const initialBoard = location.state?.Board
+  const numGolds = location.state?.numGolds
   console.log("init board:", initialBoard)
 
   //   const initialBoard2 = Array.from({ length: 10 }, () =>
@@ -22,6 +24,18 @@ const WumpusGameBoard = () => {
   const [agentPosition, setAgentPosition] = useState({ x: 0, y: 0 });
   const [isMoving, setIsMoving] = useState(false);
   const [visitedCells, setVisitedCells] = useState([]); // Track visited cells
+  const [gameOver, setGameOver] = useState(false)
+  const [score, setScore] = useState(0)
+  const [gold, setGold] = useState(numGolds)
+  const [arrow, setArrow] = useState(5)
+
+  // setVisitedCells([...visitedCells, {x:0,y:0}]);
+
+  useEffect(() => {
+
+    setVisitedCells([...visitedCells, { x: 0, y: 0 }]);
+  }, []);
+
 
   const setCellValue = (rowIndex, colIndex, value) => {
     // Create a copy of the current board
@@ -67,6 +81,7 @@ const WumpusGameBoard = () => {
     //     setIsMoving(false); // Set isMoving back to false after the agent's movement
     //   }, 10); // Adjust the duration as needed
     // }
+
     axios.post("http://localhost:5000/findBestMove", {
 
     }).then((response) => {
@@ -77,62 +92,101 @@ const WumpusGameBoard = () => {
         //       return;
         //     }
 
-        // const newX = agentPosition.x + 1;
+        // const newX = agentPosition.x + 1;newY
         const moves = response.data.move
-        console.log("x:" , moves[0], "\ty=", moves[1])
+        console.log("move: ", moves)
+        // console.log("x:", moves[0], "\ty=", moves[1])
 
 
-        let newX = moves[0];
-        let newY = moves[1];
+        // let newX = moves[0];
+        // let newY = moves[1];
+
+        // setIsMoving(true);
+        // agentPosition.x = newX;
+        // agentPosition.y = newY;
+        // setVisitedCells([...visitedCells, agentPosition]);
+        // // console.log("x: " + newX + " y: " + newY);
+        // console.log("agent position: " + agentPosition.x + " " + agentPosition.y)
+
+        // setTimeout(() => {
+        //   setAgentPosition({ x: agentPosition.x, y: agentPosition.y });
+
+        //   setIsMoving(false); // Set isMoving back to false after the agent's movement
+        // }, 100); // Adjust the duration as needed
+
+        /*------GAME OVER LOGIC------*/
+        // console.log("current box: ", board[newX][newY])
+        // if (board[newX][newY] === "W") {
+        //   setGameOver(true)
+        //   console.log("You were eaten by wumpus");
+        // }
+        // else if (board[newX][newY] === "P") {
+        //   setGameOver(true)
+        //   console.log("You fell into a pit");
+        // }
+
+        // else if (board[newX][newY] === "G" || board[newX][newY] === "GS" || board[newX][newY] === "GB" || board[newX][newY] === "GBS") {
+        //   setScore(score+10)
+        //   setGold(gold-1)
+        //   // setGameOver(true)
+        //   // console.log("You fell into a pit");
+        // }
+
+
+        let newX = agentPosition.x;
+        let newY = agentPosition.y;
+
+        for (const move of moves) {
+
+
+          // this doesn't works......... ulta lekha.........
+          // if (move == "R") {
+          //   newY = newX + 1;
+          // }
+          // else if (move == "L") {
+          //   newX = newX- 1;
+          // }
+          // else if (move == "U") {
+          //   newY = newY- 1;
+          // }
+          // else if (move == "D") {
+          //   newY = newY+ 1;
+          // }
+
+
+
+          // Rakibul wrote this..............
+          if (move === "R") {
+            newY = newY + 1;
+          }
+          else if (move === "L") {
+            newY = newY - 1;
+          }
+          else if (move === "U") {
+            newX = newX - 1;
+          }
+          else if (move === "D") {
+            newX = newX + 1;
+          }
+
+          if (newX < 10 && newY < 10) {
+            console.log("moving agent position");
 
             setIsMoving(true);
-            agentPosition.x= newY;
-            agentPosition.y= newX;
+            agentPosition.x = newX;
+            agentPosition.y = newY;
             setVisitedCells([...visitedCells, agentPosition]);
             // console.log("x: " + newX + " y: " + newY);
-            console.log("agent position: " + newX + " "+ newY)
+            console.log("agent position: " + newX + " " + newY)
 
             setTimeout(() => {
               setAgentPosition({ x: agentPosition.x, y: agentPosition.y });
 
-            setIsMoving(false); // Set isMoving back to false after the agent's movement
-            },100); // Adjust the duration as needed
-
-        // let newX = agentPosition.x;
-        // let newY = agentPosition.y;
-
-        // for (const move of moves) {
-        //   if (move == "R") {
-        //     newX = newX + 1;
-        //   }
-        //   else if (move == "L") {
-        //     newX = newX- 1;
-        //   }
-        //   else if (move == "U") {
-        //     newY = newY- 1;
-        //   }
-        //   else if (move == "D") {
-        //     newY = newY+ 1;
-        //   }
-
-        //   if (newX < 10 && newY <10) {
-        //     console.log("moving agent position");
-
-        //     setIsMoving(true);
-        //     agentPosition.x= newX;
-        //     agentPosition.y= newY;
-        //     setVisitedCells([...visitedCells, agentPosition]);
-        //     // console.log("x: " + newX + " y: " + newY);
-        //     console.log("agent position: " + newX + " "+ newY)
-
-        //     setTimeout(() => {
-        //       setAgentPosition({ x: agentPosition.x, y: agentPosition.y });
-
-        //     setIsMoving(false); // Set isMoving back to false after the agent's movement
-        //     },2000); // Adjust the duration as needed
-        //   }
-        //   // console.log("making move : " ,move); // This will print each character in the string
-        // }
+              setIsMoving(false); // Set isMoving back to false after the agent's movement
+            }, 2000); // Adjust the duration as needed
+          }
+          // console.log("making move : " ,move); // This will print each character in the string
+        }
 
 
 
@@ -151,6 +205,9 @@ const WumpusGameBoard = () => {
     setAgentPosition({ x: 0, y: 0 });
     navigate('/');
   };
+  const closeModal = () => {
+    setGameOver(false);
+  };
 
   return (
     <>
@@ -166,18 +223,18 @@ const WumpusGameBoard = () => {
                     <td
                       key={colIndex}
                       className={
-                        rowIndex === agentPosition.y && colIndex === agentPosition.x
+                        rowIndex === agentPosition.x && colIndex === agentPosition.y
                           ? getCellColor(board, colIndex, rowIndex)
                           : visitedCells.some(
                             (visitedCell) =>
-                              visitedCell.x === colIndex && visitedCell.y === rowIndex
+                              visitedCell.y === colIndex && visitedCell.x === rowIndex
                           )
                             ? getCellColor(board, colIndex, rowIndex)
                             : cell
                       }
                     >
 
-                      {rowIndex === agentPosition.y && colIndex === agentPosition.x && !isMoving && (
+                      {rowIndex === agentPosition.x && colIndex === agentPosition.y && !isMoving && (
                         <FaUser className="agent-icon" />
                       )}
                     </td>
@@ -188,30 +245,65 @@ const WumpusGameBoard = () => {
           </Table>
         </div>
 
-        <div className="info-container">
-          <div className="info-item">
-            <FaCoins className="gold-icon" />
-            <span className="gold-text">Gold</span>
+        <div className='container'>
+          <div className="info-container">
+            <div className="info-item">
+              <FaCoins className="gold-icon" />
+              <span className="gold-text">Gold</span>
+            </div>
+
+            <div className="info-item">
+              <FaCoins className="GS-icon" />
+              <span className="GS-text">Gold+Stench</span>
+            </div>
+
+            <div className="info-item">
+              <FaCoins className="GB-icon" />
+              <span className="GB-text">Gold+Breeze</span>
+            </div>
+
+            <div className="info-item">
+              <FaCoins className="GBS-icon" />
+              <span className="GBS-text">Gold+Breeze+Stench</span>
+            </div>
+
+            <div className="info-item">
+              <FaSkull className="both-icon" />
+              <span className="both-text">breeze + stench</span>
+            </div>
+
+            <div className="info-item">
+              <FaBolt className="stench-icon" />
+              <span className="stench-text">Stench</span>
+            </div>
+
+            <div className="info-item">
+              <div className="breeze-icon" />
+              <span className="breeze-text">Breeze</span>
+            </div>
+
           </div>
 
-          <div className="info-item">
-            <FaSkull className="both-icon" />
-            <span className="both-text">breeze + stench</span>
+          {/* menu */}
+          <div className='menu_container'>
+            <div className="">
+              {/* <div className="breeze-icon" /> */}
+              <span>Score {score}</span>
+            </div>
+
+            <div className="">
+              {/* <div className="breeze-icon" /> */}
+              <span>Gold {gold}</span>
+            </div>
+
+            <div className="">
+              {/* <div className="breeze-icon" /> */}
+              <span>Arrow</span>
+            </div>
           </div>
-
-          <div className="info-item">
-            <FaBolt className="stench-icon" />
-            <span className="stench-text">Stench</span>
-          </div>
-
-          <div className="info-item">
-            <div className="breeze-icon" />
-            <span className="breeze-text">Breeze</span>
-          </div>
-
-
         </div>
-        <div className="button-container">
+
+        {!gameOver && (<div className="button-container" >
           <Button className='move-btn' variant="primary" onClick={handleMoveClick}>
             Move
           </Button>
@@ -221,8 +313,24 @@ const WumpusGameBoard = () => {
           <Button className='restart-btn' variant="danger" onClick={handleRestartClick}>
             Restart Game
           </Button>
-        </div>
+        </div>)}
       </div>
+
+      {gameOver && (
+        <div className="modal">
+          <div className="modal-content" style={{ display: 'flex', flexDirection: 'column', }}>
+            <span className="close" onClick={closeModal}>
+              &times;
+            </span>
+            <h1 >Game Over Biatch</h1>
+            <Button className='restart-btn' variant="danger" onClick={handleRestartClick} style={{ width: '20%' }}>
+              Restart Game
+            </Button>
+          </div>
+        </div>
+      )}
+
+
 
     </>
   );

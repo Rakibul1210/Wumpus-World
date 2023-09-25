@@ -40,45 +40,45 @@ const port = 5000;
 
 
 app.get('/', (req, res) => {
-    res.send('Hello, Wumpus World!');
+  res.send('Hello, Wumpus World!');
 });
 
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+  console.log(`Server is running on port ${port}`);
 });
 
 
-app.route('/setBoardData').post( async(req, res) => {
-    try{
-        const numberOfPits = req.body.numberOfPits;
-        const numberOfGolds = req.body.numberOfGolds;
-        const numberOfWumpus = req.body.numberOfWumpus;
+app.route('/setBoardData').post(async (req, res) => {
+  try {
+    const numberOfPits = req.body.numberOfPits;
+    const numberOfGolds = req.body.numberOfGolds;
+    const numberOfWumpus = req.body.numberOfWumpus;
 
-        board = new Board(10, numberOfPits, numberOfGolds, numberOfWumpus);
+    board = new Board(10, numberOfPits, numberOfGolds, numberOfWumpus);
 
-        console.log('G: ',numberOfGolds);
-        console.log(board)
-        res.json({board: board});
-        
-     } catch (err) {
-       res.status(400).json('error getting board data from ui: ' + err);
-     }
-  });
+    console.log('G: ', numberOfGolds);
+    console.log(board)
+    res.json({ board: board });
 
-  app.route('/findBestMove').post(async(req, res) => {
-    try{
+  } catch (err) {
+    res.status(400).json('error getting board data from ui: ' + err);
+  }
+});
+
+app.route('/findBestMove').post(async (req, res) => {
+  try {
 
     console.log("Here to find best move");
     // board.display()
     move = board.findBestMove();
+    // console.log("move: " + move)
 
-    return res.json({move: move});
+    return res.json({ move: move });
     // return res.json({"msg": "move"});
-    }
-    catch (err) {
-        res.status(502).json('internal server errrors: ');
-        console.log(err)
-    }
-    
-  })
-  
+  }
+  catch (err) {
+    res.status(502).json('internal server errrors: ');
+    console.log(err)
+  }
+
+})
