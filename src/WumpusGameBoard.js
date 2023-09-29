@@ -138,24 +138,6 @@ const WumpusGameBoard = () => {
 
         for (const move of moves) {
 
-
-          // this doesn't works......... ulta lekha.........
-          // if (move == "R") {
-          //   newY = newX + 1;
-          // }
-          // else if (move == "L") {
-          //   newX = newX- 1;
-          // }
-          // else if (move == "U") {
-          //   newY = newY- 1;
-          // }
-          // else if (move == "D") {
-          //   newY = newY+ 1;
-          // }
-
-
-
-          // Rakibul wrote this..............
           if (move === "R") {
             newY = newY + 1;
           }
@@ -183,7 +165,7 @@ const WumpusGameBoard = () => {
               setAgentPosition({ x: agentPosition.x, y: agentPosition.y });
 
               setIsMoving(false); // Set isMoving back to false after the agent's movement
-            }, 2000); // Adjust the duration as needed
+            }, 100); // Adjust the duration as needed
           }
           // console.log("making move : " ,move); // This will print each character in the string
         }

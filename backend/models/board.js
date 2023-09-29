@@ -9,7 +9,8 @@ class Board {
         this.currentCol = 0;
         this.arrow = 1;
         this.moveCount = 0;
-
+        this.goldFound = 0;
+        this.totalGold = numberOfGold;
 
         for (let i = 0; i < gridSize; i++) {
             this.grid[i] = new Array(gridSize).fill("");
@@ -26,67 +27,14 @@ class Board {
         this.possibelPits = new Array();
         this.possibleWumpus = new Array();
 
-        this.placePits(numberOfPits);
         this.placeGold(numberOfGold);
+        this.placePits(numberOfPits);
         this.placeWumpus(numberOfWumpus);
 
         this.placeAgent(this.currentRow, this.currentCol);
 
         this.addBreeze();
         this.addStench();
-    }
-
-    moveLeft() {
-        if (this.isValidCoordinate(this.currentRow, this.currentCol - 1)) {
-
-
-
-            this.grid[this.currentRow][this.currentCol] = this.grid[this.currentRow][this.currentCol].slice(0, -1);
-            this.currentCol -= 1;
-            this.grid[this.currentRow][this.currentCol] += "A";
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    moveRight() {
-        if (this.isValidCoordinate(this.currentRow, this.currentCol + 1)) {
-            this.grid[this.currentRow][this.currentCol] = this.grid[this.currentRow][
-                this.currentCol
-            ].slice(0, -1);
-            this.currentCol += 1;
-            this.grid[this.currentRow][this.currentCol] += "A";
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    moveUp() {
-        if (this.isValidCoordinate(this.currentRow - 1, this.currentCol)) {
-            this.grid[this.currentRow][this.currentCol] = this.grid[this.currentRow][
-                this.currentCol
-            ].slice(0, -1);
-            this.currentRow -= 1;
-            this.grid[this.currentRow][this.currentCol] += "A";
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    moveDown() {
-        if (this.isValidCoordinate(this.currentRow + 1, this.currentCol)) {
-            this.grid[this.currentRow][this.currentCol] = this.grid[this.currentRow][
-                this.currentCol
-            ].slice(0, -1);
-            this.currentRow += 1;
-            this.grid[this.currentRow][this.currentCol] += "A";
-            return true;
-        } else {
-            return false;
-        }
     }
 
     addBreeze() {
@@ -181,17 +129,6 @@ class Board {
         }
     }
 
-    // generateRandomEnvironment(numberOfPits, numberOfGold, hasWumpus) {
-    // this.clearBoard();
-
-    // this.placePits(numberOfPits);
-    // this.placeGold(numberOfGold);
-    // if (hasWumpus) {
-    // this.placeWumpus();
-    // }
-    // this.placeAgent(0, 0);
-    // }
-
     setCell(x, y, content) {
         if (this.isValidCoordinate(x, y)) {
             this.grid[x][y] = content;
@@ -213,7 +150,7 @@ class Board {
         for (let i = 0; i < numberOfPits; i++) {
             const x = Math.floor(Math.random() * this.gridSize);
             const y = Math.floor(Math.random() * this.gridSize);
-            if ((x == 0 && y == 0) || (x == 0 && y == 1) || (x == 1 && y == 0)) {
+            if (this.grid[x][y].includes('P') || this.grid[x][y].includes('G') || (x == 0 && y == 0) || (x == 0 && y == 1) || (x == 1 && y == 0)) {
                 i--;
                 continue;
             }
@@ -225,6 +162,10 @@ class Board {
         for (let i = 0; i < numberOfGold; i++) {
             const x = Math.floor(Math.random() * this.gridSize);
             const y = Math.floor(Math.random() * this.gridSize);
+            if (this.grid[x][y].includes('G') || (x == 0 && y == 0)) {
+                i--;
+                continue;
+            }
             this.setCell(x, y, "G");
         }
     }
@@ -233,17 +174,26 @@ class Board {
         for (let i = 0; i < numberOfPits; i++) {
             const x = Math.floor(Math.random() * this.gridSize);
             const y = Math.floor(Math.random() * this.gridSize);
+            if (this.grid[x][y].includes('W') || this.grid[x][y].includes('P') || (x == 0 && y == 0) || (x == 0 && y == 1) || (x == 1 && y == 0)) {
+                i--;
+                continue;
+            }
             this.setCell(x, y, "W");
         }
     }
 
     placeAgent(x, y) {
-        // this.setCell(x, y, "A");
         this.currentRow = x;
         this.currentCol = y;
         this.visitedRooms[x][y] = true;
 
+        if (this.grid[x][y].includes('G')) {
+            // console.log("Eite Peyegesiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
+            this.goldFound += 1;
+        }
         this.grid[x][y] += "A";
+
+
 
 
         if (this.isValidCoordinate(x - 1, y) && this.visitedRooms[x - 1][y] === false) {
@@ -299,12 +249,6 @@ class Board {
     }
 
 
-
-
-
-
-
-
     placeAgentToNewDestination(path) {
         // console.log("#1 we were here", path, this.currentRow, this.currentCol);
         for (const p of path) {
@@ -348,12 +292,6 @@ class Board {
             let row = s[0]
             let col = s[1]
 
-            // console.log("s: " + s)
-
-            if (row === end[0] && col === end[1]) {
-                return path;
-            }
-
             // console.log("row", row, "col", col);
             visited[row][col] = true; // Ensure that visited is correctly initialized
 
@@ -361,14 +299,12 @@ class Board {
                 const newRow = row + dr;
                 const newCol = col + dc;
 
-                if (
-                    newRow >= 0 &&
-                    newRow < this.gridSize &&
-                    newCol >= 0 &&
-                    newCol < this.gridSize &&
-                    !visited[newRow][newCol] &&
-                    !this.visitedRooms[newRow][newCol]
-                ) {
+
+                if (newRow === end[0] && newCol === end[1]) {
+                    return path + direction;
+                }
+
+                if (this.isValidCoordinate(newRow, newCol) && !visited[newRow][newCol] && this.visitedRooms[newRow][newCol]) {
                     queue.push([[newRow, newCol], path + direction]);
                     visited[newRow][newCol] = true;
                 }
@@ -379,24 +315,9 @@ class Board {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // not this............................
     findSafeAndShortestMove() {
 
 
-        let start = [this.currentRow, this.currentCol]
 
         for (let i = 0; i < this.adjacentRooms.length && this.adjacentRooms[0][2] == this.adjacentRooms[i][2]; i++) {
             let start = [this.currentRow, this.currentCol]
@@ -408,38 +329,35 @@ class Board {
         }
 
 
-        // const i = index;
-        // if (i > 0 && i < this.adjacentRooms.length) { // Ensure 'i' is within valid bounds.
-        //     const elementToMove = this.adjacentRooms.splice(i, 1)[0]; // Remove the element from 'i' and store it.
-        //     this.adjacentRooms.unshift(null); // Add a placeholder element at the 0th position.
-
-        //     // Shift the elements to the right
-        //     for (let j = this.adjacentRooms.length - 1; j > 0; j--) {
-        //         this.adjacentRooms[j] = this.adjacentRooms[j - 1];
-        //     }
-
-        //     // Place the elementToMove at the 0th position
-        //     this.adjacentRooms[0] = elementToMove;
-        // }
+    }
 
 
+    homeComing() {
+        let start = [this.currentRow, this.currentCol]
+        let end = [0, 0]
 
-        // return minPath;
+        let path = this.findShortestPath(start, end);
+        console.log("path to home: ", path);
+        return path;
+
     }
 
 
     findBestMove() {
 
-        // let arrow = 1;
         this.moveCount += 1;
         console.log("--------MOVE-> " + this.moveCount);
         console.log("--------agent-> ", this.currentRow, this.currentCol);
-        // console.log("FindBestMove called");
-        this.display();
-        console.log("adjacency room from find best move : ", this.adjacentRooms);
-        // console.log("Visison room : ", this.visitedRooms);
-        // this.displayVisited();
 
+        // console.log("adjacency room from find best move : ", this.adjacentRooms);
+
+        let bestPath;
+        console.log(this.goldFound, this.totalGold);
+        if (this.goldFound == this.totalGold) {
+            console.log("Ammu basay jabo");
+            bestPath = this.homeComing();
+            return bestPath;
+        }
 
         for (let i = 0; i < this.adjacentRooms.length; i++) {
             this.adjacentRooms[i][2] = 0;
@@ -549,38 +467,39 @@ class Board {
         }
 
 
+        let start = [this.currentRow, this.currentCol]
 
+        for (let i = 0; i < this.adjacentRooms.length; i++) {
+            let end = [this.adjacentRooms[i][0], this.adjacentRooms[i][1]];
+            let path = this.findShortestPath(start, end);
+            console.log("start: ", start, " end:", end, " path: ", path);
 
-        let bestPath;
-        try {
-
-            let start = [this.currentRow, this.currentCol]
-
-            for (let i = 0; i < this.adjacentRooms.length; i++) {
-                let end = [this.adjacentRooms[i][0], this.adjacentRooms[i][1]];
-                let path = this.findShortestPath(start, end);
-                console.log("start: ", start, " end:", end, " path: ", path);
-
-                this.adjacentRooms[i][3] = path.length;
-            }
-
-            this.adjacentRooms.sort((a, b) => {
-                if (a[2] !== b[2]) {
-                    return a[2] - b[2];
-                } else {
-                    return a[3] - b[3];
-                }
-            });
-            let end = [this.adjacentRooms[0][0], this.adjacentRooms[0][1]];
-            console.log("------->sorted by path length adjacentRooms", this.adjacentRooms);
-
-
-            bestPath = this.findShortestPath(start, end);
-
-            console.log("----->bestPath: ", bestPath);
-        } catch (e) {
-            console.error(e);
+            this.adjacentRooms[i][3] = path.length;
         }
+
+        this.adjacentRooms.sort((a, b) => {
+            if (a[2] !== b[2]) {
+                return a[2] - b[2];
+            } else {
+                return a[3] - b[3];
+            }
+        });
+        console.log("------->sorted by path length adjacentRooms", this.adjacentRooms);
+
+
+
+
+        //TODO: check if it has zero danger: else go for some wumpus killing...
+
+        if (this.adjacentRooms[0][2] == 0) {
+            let end = [this.adjacentRooms[0][0], this.adjacentRooms[0][1]];
+        } else {
+            // time to kill some wumpups..........
+        }
+
+        bestPath = this.findShortestPath(start, end);
+
+        console.log("----->bestPath: ", bestPath);
 
 
 
@@ -591,7 +510,6 @@ class Board {
 
         // remove agent from the last position
         this.grid[this.currentRow][this.currentCol] = this.grid[this.currentRow][this.currentCol].slice(0, -1);
-        // place to the new location
         this.placeAgentToNewDestination(bestPath);
         console.log("Agent final position: ", this.currentRow, this.currentCol);
 
