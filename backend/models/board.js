@@ -352,7 +352,7 @@ class Board {
         // console.log("adjacency room from find best move : ", this.adjacentRooms);
 
         let bestPath;
-        console.log(this.goldFound, this.totalGold);
+        // console.log(this.goldFound, this.totalGold);
         if (this.goldFound == this.totalGold) {
             console.log("Ammu basay jabo");
             bestPath = this.homeComing();
@@ -378,7 +378,7 @@ class Board {
         });
 
 
-        console.log("uniques adjacentRooms", this.adjacentRooms);
+        // console.log("uniques adjacentRooms", this.adjacentRooms);
 
         for (let i = 0; i < this.adjacentRooms.length; i++) {
             let safe = 0;
@@ -387,7 +387,7 @@ class Board {
             let bs = 0;
             let x = this.adjacentRooms[i][0];
             let y = this.adjacentRooms[i][1];
-            console.log("calculating danger for x=", x, "y=", y)
+            // console.log("calculating danger for x=", x, "y=", y)
             if (this.isValidCoordinate(x - 1, y) && this.visitedRooms[x - 1][y]) { //left
                 if (this.grid[x - 1][y].includes("BS")) {
                     bs += 1;
@@ -463,7 +463,7 @@ class Board {
 
             // console.log("adjacency:", this.adjacentRooms[x][y])
             this.adjacentRooms[i][2] = danger;
-            console.log("danger:", danger);
+            // console.log("danger:", danger);
         }
 
 
@@ -472,7 +472,7 @@ class Board {
         for (let i = 0; i < this.adjacentRooms.length; i++) {
             let end = [this.adjacentRooms[i][0], this.adjacentRooms[i][1]];
             let path = this.findShortestPath(start, end);
-            console.log("start: ", start, " end:", end, " path: ", path);
+            // console.log("start: ", start, " end:", end, " path: ", path);
 
             this.adjacentRooms[i][3] = path.length;
         }
@@ -491,10 +491,15 @@ class Board {
 
         //TODO: check if it has zero danger: else go for some wumpus killing...
 
+        let end;
         if (this.adjacentRooms[0][2] == 0) {
-            let end = [this.adjacentRooms[0][0], this.adjacentRooms[0][1]];
+            end = [this.adjacentRooms[0][0], this.adjacentRooms[0][1]];
         } else {
             // time to kill some wumpups..........
+
+            console.log("Time to kill some wumpups..........");
+            end = [this.adjacentRooms[0][0], this.adjacentRooms[0][1]];
+
         }
 
         bestPath = this.findShortestPath(start, end);
@@ -505,7 +510,7 @@ class Board {
 
         // console.log("before shifting: ", this.adjacentRooms);
         this.adjacentRooms.shift();
-        console.log(" after shifting: ", this.adjacentRooms);
+        // console.log(" after shifting: ", this.adjacentRooms);
 
 
         // remove agent from the last position

@@ -151,6 +151,30 @@ const WumpusGameBoard = () => {
             newX = newX + 1;
           }
 
+
+          //just checking....
+
+          /*------GAME OVER LOGIC------*/
+          console.log("current box: ", board[newX][newY])
+          if (board[newX][newY] === "W") {
+            setGameOver(true)
+            console.log("You were killed by wumpus");
+          }
+          else if (board[newX][newY] === "P") {
+            setGameOver(true)
+            console.log("You fell into a pit");
+          }
+
+          else if (board[newX][newY] === "G" || board[newX][newY] === "GS" || board[newX][newY] === "GB" || board[newX][newY] === "GBS") {
+            setScore(score + 10)
+            setGold(gold - 1)
+            // setGameOver(true)
+            // console.log("You fell into a pit");
+          }
+
+
+
+
           if (newX < 10 && newY < 10) {
             console.log("moving agent position");
 
