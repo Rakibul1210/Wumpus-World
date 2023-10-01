@@ -1,5 +1,5 @@
-const pitDanger = 2000;
-const wumpusDanger = 400;
+const PIT_DANGER = 2000;
+const WUMPUS_DANGER = 500;
 
 class Board {
     constructor(gridSize, numberOfPits, numberOfGold, numberOfWumpus) {
@@ -249,6 +249,64 @@ class Board {
     }
 
 
+    shootArrow(x, y) {
+        console.log(x, " ", y, "Dishhoooooooooooooooo");
+        this.arrow -= 1;
+        if (this.grid[x][y].includes('W')) {
+
+            // removing wumpus from the shooted cell
+            if (this.grid[x][y] == "W") {
+                this.grid[x][y] = '';
+            }
+            else if (this.grid[x][y] == "WS") {
+                this.grid[x][y] = 'S';
+            }
+            else if (this.grid[x][y] == 'WB') {
+                this.grid[x][y] = 'B';
+            }
+            else if (this.grid[x][y] == 'WBS') {
+                this.grid[x][y] = 'BS';
+            }
+
+            // removing stench from the adjacent cells
+            if (this.isValidCoordinate(x - 1, y) && this.visitedRooms[x - 1][y]) {
+                if (this.grid[x - 1][y] == 'S') {
+                    this.grid[x - 1][y] = '';
+                }
+                else if (this.grid[x - 1][y] == 'BS') {
+                    this.grid[x - 1][y] = 'B';
+                }
+            }
+            if (this.isValidCoordinate(x + 1, y) && this.visitedRooms[x + 1][y]) {
+                if (this.grid[x + 1][y] == 'S') {
+                    this.grid[x + 1][y] = '';
+                }
+                else if (this.grid[x + 1][y] == 'BS') {
+                    this.grid[x + 1][y] = 'B';
+                }
+            }
+            if (this.isValidCoordinate(x, y - 1) && this.visitedRooms[x][y - 1]) {
+                if (this.grid[x][y - 1] == 'S') {
+                    this.grid[x][y - 1] = ''
+                }
+                else if (this.grid[x][y - 1] == 'BS') {
+                    this.grid[x][y - 1] = 'B'
+                }
+            }
+            if (this.isValidCoordinate(x, y + 1) && this.visitedRooms[x][y + 1]) {
+                if (this.grid[x][y + 1] == 'S') {
+                    this.grid[x][y + 1] = ''
+                }
+                else if (this.grid[x][y + 1] == 'BS') {
+                    this.grid[x][y + 1] = 'B'
+                }
+            }
+
+
+        }
+
+    }
+
     placeAgentToNewDestination(path) {
         // console.log("#1 we were here", path, this.currentRow, this.currentCol);
         for (const p of path) {
@@ -439,7 +497,6 @@ class Board {
                 }
             }
 
-            // TODO: Calculate Danger according to the number of breeze and stench values..................DONE...........
 
             let danger = 0;
             if (safe) {
@@ -449,16 +506,16 @@ class Board {
                 danger = 0;
             }
             else if (breeze) {
-                danger = pitDanger * (breeze + bs);
+                danger = PIT_DANGER * (breeze + bs);
             }
             else if (stench) {
                 if (this.arrow)
-                    danger = wumpusDanger * (stench + bs);
+                    danger = WUMPUS_DANGER * (stench + bs);
                 else
-                    danger = pitDanger * (stench + bs);
+                    danger = PIT_DANGER * (stench + bs);
             }
             else if (bs) {
-                danger += pitDanger * bs;
+                danger += PIT_DANGER * bs;
             }
 
             // console.log("adjacency:", this.adjacentRooms[x][y])
@@ -489,22 +546,89 @@ class Board {
 
 
 
-        //TODO: check if it has zero danger: else go for some wumpus killing...
 
         let end;
-        if (this.adjacentRooms[0][2] == 0) {
-            end = [this.adjacentRooms[0][0], this.adjacentRooms[0][1]];
-        } else {
-            // time to kill some wumpups..........
+        // if (this.adjacentRooms[0][2] == 0 || this.arrow == 0 ) {
+        //     end = [this.adjacentRooms[0][0], this.adjacentRooms[0][1]];
+        // } else {
+        // time to kill some wumpups..........
 
-            console.log("Time to kill some wumpups..........");
-            end = [this.adjacentRooms[0][0], this.adjacentRooms[0][1]];
+        var useArrow = false;
+        if (this.adjacentRooms[0][2] != 0 && this.adjacentRooms[0][2] < 2000 && this.arrow) {
+            console.log("Time to kill some wumpups........");
 
+            useArrow = true;
+            for (let i = 0; i < this.adjacentRooms.length && this.adjacentRooms[i][2] < 2000; i++) {
+                // find visitable neighbors
+                let x = this.adjacentRooms[i][0];
+                let y = this.adjacentRooms[i][1];
+                let stenchCount = this.adjacentRooms[i][2] / WUMPUS_DANGER;
+                let visitable = 0;
+
+                console.log("Possible wumpus at: " + x + ", y: " + y);
+
+                if (this.isValidCoordinate(x - 1, y) && !this.visitedRooms[x - 1][y]) {
+                    visitable += 1;
+                }
+                if (this.isValidCoordinate(x + 1, y) && !this.visitedRooms[x + 1][y]) {
+                    visitable += 1;
+                }
+                if (this.isValidCoordinate(x, y - 1) && !this.visitedRooms[x][y - 1]) {
+                    visitable += 1;
+                }
+                if (this.isValidCoordinate(x, y + 1) && !this.visitedRooms[x][y + 1]) {
+                    visitable += 1;
+                }
+                console.assert(' strench counter: ', stenchCount, " visitable: ", stenchCount);
+
+                if (stenchCount == 3 && visitable == 1) {
+                    this.adjacentRooms[i][2] = 100;
+                }
+                else if (stenchCount == 2 && visitable == 2) {
+                    this.adjacentRooms[i][2] = 150;
+                }
+                else if (stenchCount == 2 && visitable == 1) {
+                    this.adjacentRooms[i][2] = 120;
+                }
+                else if (stenchCount == 1 && visitable == 3) {
+                    this.adjacentRooms[i][2] = 250;
+                }
+                else if (stenchCount == 1 && visitable == 2) {
+                    this.adjacentRooms[i][2] = 200;
+                }
+                else if (stenchCount == 1 && visitable == 1) {
+                    this.adjacentRooms[i][2] = 180;
+                }
+
+
+                console.log("New danger for", x, y, " = ", this.adjacentRooms[i][2]);
+            }
+
+            this.adjacentRooms.sort((a, b) => {
+                if (a[2] !== b[2]) {
+                    return a[2] - b[2];
+                } else {
+                    return a[3] - b[3];
+                }
+            });
+            console.log("# sorted by new danger adjacentRooms ", this.adjacentRooms);
         }
 
-        bestPath = this.findShortestPath(start, end);
 
-        console.log("----->bestPath: ", bestPath);
+        end = [this.adjacentRooms[0][0], this.adjacentRooms[0][1]];
+
+
+
+
+        bestPath = this.findShortestPath(start, end);
+        console.log("bestPath: ", bestPath);
+
+        if (useArrow) {
+            this.shootArrow(this.adjacentRooms[0][0], this.adjacentRooms[0][1]);
+            bestPath = bestPath.slice(0, -1) + "A" + bestPath.slice(-1);
+            console.log("bestPath with arrow: ", bestPath);
+        }
+
 
 
 

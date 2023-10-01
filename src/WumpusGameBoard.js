@@ -65,6 +65,15 @@ const WumpusGameBoard = () => {
     // Use the color mapping or a default color for unknown cell types
     return colorMap[cellType] || 'agent-cell'; // Default to yellow if the cell type is unknown
   };
+
+  const updateUI = (X, Y) => {
+    setTimeout(() => {
+      setAgentPosition({ x: X, y: Y });
+
+      setIsMoving(false); // Set isMoving back to false after the agent's movement
+    }, 50); // Adjust the duration as needed
+  }
+
   const handleMoveClick = () => {
     //     if (isMoving) {
     //       // Agent is already moving, don't allow additional clicks
@@ -185,11 +194,12 @@ const WumpusGameBoard = () => {
             // console.log("x: " + newX + " y: " + newY);
             console.log("agent position: " + newX + " " + newY)
 
-            setTimeout(() => {
-              setAgentPosition({ x: agentPosition.x, y: agentPosition.y });
+            updateUI(agentPosition.x, agentPosition.y);
+            // setTimeout(() => {
+            //   setAgentPosition({ x: agentPosition.x, y: agentPosition.y });
 
-              setIsMoving(false); // Set isMoving back to false after the agent's movement
-            }, 100); // Adjust the duration as needed
+            //   setIsMoving(false); // Set isMoving back to false after the agent's movement
+            // }, 100); // Adjust the duration as needed
           }
           // console.log("making move : " ,move); // This will print each character in the string
         }
