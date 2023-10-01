@@ -269,37 +269,63 @@ class Board {
             }
 
             // removing stench from the adjacent cells
-            if (this.isValidCoordinate(x - 1, y) && this.visitedRooms[x - 1][y]) {
+            if (this.isValidCoordinate(x - 1, y)) {
                 if (this.grid[x - 1][y] == 'S') {
                     this.grid[x - 1][y] = '';
                 }
                 else if (this.grid[x - 1][y] == 'BS') {
                     this.grid[x - 1][y] = 'B';
                 }
+                else if (this.grid[x - 1][y] == 'GS') {
+                    this.grid[x - 1][y] = 'G';
+                }
+                else if (this.grid[x - 1][y] == 'GBS') {
+                    this.grid[x - 1][y] = 'GB';
+                }
             }
-            if (this.isValidCoordinate(x + 1, y) && this.visitedRooms[x + 1][y]) {
+            if (this.isValidCoordinate(x + 1, y)) {
                 if (this.grid[x + 1][y] == 'S') {
                     this.grid[x + 1][y] = '';
                 }
                 else if (this.grid[x + 1][y] == 'BS') {
                     this.grid[x + 1][y] = 'B';
                 }
+                else if (this.grid[x + 1][y] == 'GS') {
+                    this.grid[x + 1][y] = 'G';
+                }
+                else if (this.grid[x + 1][y] == 'GBS') {
+                    this.grid[x + 1][y] = 'GB';
+                }
             }
-            if (this.isValidCoordinate(x, y - 1) && this.visitedRooms[x][y - 1]) {
+            if (this.isValidCoordinate(x, y - 1)) {
                 if (this.grid[x][y - 1] == 'S') {
                     this.grid[x][y - 1] = ''
                 }
                 else if (this.grid[x][y - 1] == 'BS') {
                     this.grid[x][y - 1] = 'B'
                 }
+                else if (this.grid[x][y - 1] == 'GS') {
+                    this.grid[x][y - 1] = 'G';
+                }
+                else if (this.grid[x][y - 1] == 'GBS') {
+                    this.grid[x][y - 1] = 'GB';
+                }
             }
-            if (this.isValidCoordinate(x, y + 1) && this.visitedRooms[x][y + 1]) {
+            if (this.isValidCoordinate(x, y + 1)) {
                 if (this.grid[x][y + 1] == 'S') {
                     this.grid[x][y + 1] = ''
                 }
                 else if (this.grid[x][y + 1] == 'BS') {
                     this.grid[x][y + 1] = 'B'
                 }
+                else if (this.grid[x][y + 1] == 'GS') {
+                    this.grid[x][y + 1] = 'G';
+                }
+                else if (this.grid[x][y + 1] == 'GBS') {
+                    this.grid[x][y + 1] = 'GB';
+                }
+
+
             }
 
 
