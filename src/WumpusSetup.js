@@ -24,6 +24,8 @@ function WumpusSetup() {
   //   Array.from({ length: 10 }, () => 'empty')
   // ));
   const [Board, setBoard] = useState([[]])
+
+ 
   const handleStartGame = async () => {
     if (numPits === '' || numGolds === '' || numWumpus === '') {
       alert('Please fill in all fields.');
@@ -130,6 +132,7 @@ function WumpusSetup() {
         />
       </div>
       <button onClick={handleStartGame}>Start Game</button>
+
     </div>
     </>
   );

@@ -1,20 +1,72 @@
+const fs = require('fs');
+const content = fs.readFileSync('./models/input.txt', 'utf-8');
+
 const PIT_DANGER = 2000;
 const WUMPUS_DANGER = 500;
 
+
 class Board {
-    constructor(gridSize, numberOfPits, numberOfGold, numberOfWumpus) {
+    constructor(gridSize, numberOfPits, numberOfGold, numberOfWumpus, inputFromFile) {
         this.gridSize = gridSize;
         this.grid = new Array(gridSize);
         this.currentRow = 0;
         this.currentCol = 0;
+        this.numberOfGold = numberOfGold;
         this.arrow = 1;
         this.moveCount = 0;
         this.goldFound = 0;
         this.totalGold = numberOfGold;
 
-        for (let i = 0; i < gridSize; i++) {
-            this.grid[i] = new Array(gridSize).fill("");
+        if (!inputFromFile) {
+            for (let i = 0; i < gridSize; i++) {
+                this.grid[i] = new Array(gridSize).fill("");
+            }
+            this.placeGold(numberOfGold);
+            this.placePits(numberOfPits);
+            this.placeWumpus(numberOfWumpus);
+
         }
+
+        else {
+            // Initialize variables for row and column indices
+            let rowIndex = 0;
+            let colIndex = 0;
+            let numberOfGold = 0;
+
+            // Iterate through the characters
+            try {
+                for (let i = 0; i < 10; i++) {
+                    this.grid[i] = new Array(10).fill('');
+                }
+
+                let i = 0, j = 0;;
+                for (const char of content) {
+                    if (char !== '\n') {
+                        if (char === 'G') numberOfGold += 1;
+
+                        if (char === '-') this.grid[i][j++] = '';
+                        else this.grid[i][j++] = char;
+
+                        if (j === 10) {
+                            j = 0;
+                            i++;
+                        }
+                    }
+                }
+                this.totalGold = numberOfGold;
+            }
+            catch (err) {
+                console.log("error reading file: ", err);
+            }
+        }
+
+
+
+
+        this.adjacentRooms = new Array();
+        this.possibelPits = new Array();
+        this.possibleWumpus = new Array();
+
 
         this.visitedRooms = new Array(gridSize)
             .fill(null)
@@ -23,13 +75,6 @@ class Board {
             .fill(null)
             .map(() => new Array(this.gridSize).fill(0));
 
-        this.adjacentRooms = new Array();
-        this.possibelPits = new Array();
-        this.possibleWumpus = new Array();
-
-        this.placeGold(numberOfGold);
-        this.placePits(numberOfPits);
-        this.placeWumpus(numberOfWumpus);
 
         this.placeAgent(this.currentRow, this.currentCol);
 
@@ -38,7 +83,7 @@ class Board {
     }
 
     addBreeze() {
-        // console.log("addBreeze");
+        console.log("addBreeze");
         for (let i = 0; i < this.gridSize; i++) {
             for (let j = 0; j < this.gridSize; j++) {
                 if (this.grid[i][j] == "P") {
@@ -76,6 +121,7 @@ class Board {
     }
 
     addStench() {
+        console.log("add stench")
         for (let i = 0; i < this.gridSize; i++) {
             for (let j = 0; j < this.gridSize; j++) {
                 if (this.grid[i][j] == "W") {

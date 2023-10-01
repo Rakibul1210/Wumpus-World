@@ -74,6 +74,9 @@ const WumpusGameBoard = () => {
     }, 50); // Adjust the duration as needed
   }
 
+  const isValidCoordinate = (x, y) => {
+    return x >= 0 && x < 10 && y >= 0 && y < 10;
+  }
   const handleMoveClick = () => {
     //     if (isMoving) {
     //       // Agent is already moving, don't allow additional clicks
@@ -160,6 +163,107 @@ const WumpusGameBoard = () => {
             newX = newX + 1;
           }
 
+          /*-------KILL WUMpuS---------*/
+          if(move==="A"){
+
+          setScore(score-10)
+
+          if (moves[moves.length-1] === "R") {
+            newY = newY + 1;
+          }
+          else if (moves[moves.length-1] === "L") {
+            newY = newY - 1;
+          }
+          else if (moves[moves.length-1] === "U") {
+            newX = newX - 1;
+          }
+          else if (moves[moves.length-1] === "D") {
+            newX = newX + 1;
+          }
+
+
+          if (board[newX][newY].includes('W')) {
+            console.log("Wumpus killed successfully")
+
+            // removing wumpus from the shooted cell
+            if (board[newX][newY] == "W") {
+                board[newX][newY] = '';
+            }
+            else if (board[newX][newY] == "WS") {
+                board[newX][newY] = 'S';
+            }
+            else if (board[newX][newY] == 'WB') {
+                board[newX][newY] = 'B';
+            }
+            else if (board[newX][newY] == 'WBS') {
+                board[newX][newY] = 'BS';
+            }
+
+            // removing stench from the adjacent cells
+            if (isValidCoordinate(newX - 1, newY)) {
+                if (board[newX - 1][newY] == 'S') {
+                    board[newX - 1][newY] = '';
+                }
+                else if (board[newX - 1][newY] == 'BS') {
+                    board[newX - 1][newY] = 'B';
+                }
+                else if(board[newX - 1][newY] == 'GS'){
+                  board[newX - 1][newY] = 'G';
+                }
+                else if(board[newX - 1][newY] == 'GBS'){
+                  board[newX - 1][newY] = 'GB';
+                }
+            }
+            if (isValidCoordinate(newX + 1, newY)) {
+                if (board[newX + 1][newY] == 'S') {
+                    board[newX + 1][newY] = '';
+                }
+                else if (board[newX + 1][newY] == 'BS') {
+                    board[newX + 1][newY] = 'B';
+                }   
+                else if(board[newX + 1][newY] == 'GS'){
+                  board[newX +1][newY] = 'G';
+                }
+                else if(board[newX + 1][newY] == 'GBS'){
+                  board[newX + 1][newY] = 'GB';
+                }       
+
+            }
+            if (isValidCoordinate(newX, newY - 1) ) {
+                if (board[newX][newY - 1] == 'S') {
+                    board[newX][newY - 1] = ''
+                }
+                else if (board[newX][newY - 1] == 'BS') {
+                    board[newX][newY - 1] = 'B'
+                }
+                else if(board[newX][newY-1] == 'GS'){
+                  board[newX][newY-1] = 'G';
+                }
+                else if(board[newX][newY-1] == 'GBS'){
+                  board[newX][newY-1] = 'GB';
+                }
+            }
+            if (isValidCoordinate(newX, newY + 1)) {
+                if (board[newX][newY + 1] == 'S') {
+                    board[newX][newY + 1] = ''
+                }
+                else if (board[newX][newY + 1] == 'BS') {
+                    board[newX][newY + 1] = 'B'
+                }
+                else if(board[newX][newY+1] == 'GS'){
+                  board[newX][newY+1] = 'G';
+                }
+                else if(board[newX][newY+1] == 'GBS'){
+                  board[newX][newY+1] = 'GB';
+                }
+            }
+
+
+        }
+          setAgentPosition(newX, newY)
+          break;
+        }
+
 
           //just checking....
 
@@ -167,19 +271,28 @@ const WumpusGameBoard = () => {
           console.log("current box: ", board[newX][newY])
           if (board[newX][newY] === "W") {
             setGameOver(true)
+            setScore(score - 1000)
+
             console.log("You were killed by wumpus");
           }
           else if (board[newX][newY] === "P") {
             setGameOver(true)
+            setScore(score - 1000)
+
             console.log("You fell into a pit");
           }
 
           else if (board[newX][newY] === "G" || board[newX][newY] === "GS" || board[newX][newY] === "GB" || board[newX][newY] === "GBS") {
-            setScore(score + 10)
             setGold(gold - 1)
+            let sc = score+10
+            setScore(sc)
+
             // setGameOver(true)
             // console.log("You fell into a pit");
           }
+
+   
+
 
 
 
@@ -193,6 +306,7 @@ const WumpusGameBoard = () => {
             setVisitedCells([...visitedCells, agentPosition]);
             // console.log("x: " + newX + " y: " + newY);
             console.log("agent position: " + newX + " " + newY)
+            setScore(score-1)
 
             updateUI(agentPosition.x, agentPosition.y);
             // setTimeout(() => {
@@ -338,7 +452,7 @@ const WumpusGameBoard = () => {
             <span className="close" onClick={closeModal}>
               &times;
             </span>
-            <h1 >Game Over Biatch</h1>
+            <h1 >Game Over</h1>
             <Button className='restart-btn' variant="danger" onClick={handleRestartClick} style={{ width: '20%' }}>
               Restart Game
             </Button>

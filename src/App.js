@@ -2,17 +2,14 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import WumpusGameBoard from './WumpusGameBoard';
 import WumpusSetup from './WumpusSetup';
-import {
-  numPitsInitialValue,
-  numGoldsInitialValue,
-  numWumpusInitialValue,
-} from './WumpusSetup';
+import FirstPage from './FirstPage';
+
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<WumpusSetup />} /> 
-        {/* <Route path={`/WumpusGameBoard/:numPitsInitialValue/:numGoldsInitialValue/:numWumpusInitialValue`} element={<WumpusGameBoard />}/> */}
+        <Route path="/" element={<FirstPage />} /> 
+        <Route path={'/WumpusSetup'} element={<WumpusSetup />}/>
         <Route path={'/WumpusGameBoard'} element={<WumpusGameBoard />}/>
 
       </Routes>

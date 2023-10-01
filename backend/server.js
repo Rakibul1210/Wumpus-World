@@ -54,10 +54,22 @@ app.route('/setBoardData').post(async (req, res) => {
     const numberOfGolds = req.body.numberOfGolds;
     const numberOfWumpus = req.body.numberOfWumpus;
 
-    board = new Board(10, numberOfPits, numberOfGolds, numberOfWumpus);
+    board = new Board(10, numberOfPits, numberOfGolds, numberOfWumpus, false);
 
     console.log('G: ', numberOfGolds);
     console.log(board)
+    res.json({ board: board });
+
+  } catch (err) {
+    res.status(400).json('error getting board data from ui: ' + err);
+  }
+});
+
+app.route('/setFromFile').post(async (req, res) => {
+  try {
+   console.log("file input")
+    board = new Board(10, 0, 0, 0, true);
+    console.log("file board: ", board)
     res.json({ board: board });
 
   } catch (err) {
