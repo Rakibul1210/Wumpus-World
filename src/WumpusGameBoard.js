@@ -26,8 +26,12 @@ const WumpusGameBoard = () => {
   const [visitedCells, setVisitedCells] = useState([]); // Track visited cells
   const [gameOver, setGameOver] = useState(false)
   const [score, setScore] = useState(0)
+  const [moveScore, setMoveScore] = useState(0)
+  const [arrow, setArrow] = useState(1)
+  const [win, setWin] = useState(false)
+
   const [gold, setGold] = useState(numGolds)
-  const [arrow, setArrow] = useState(5)
+  const [move, setMove] = useState('')
 
   // setVisitedCells([...visitedCells, {x:0,y:0}]);
 
@@ -106,6 +110,7 @@ const WumpusGameBoard = () => {
 
         // const newX = agentPosition.x + 1;newY
         const moves = response.data.move
+        setMove(moves)
         console.log("move: ", moves)
         // console.log("x:", moves[0], "\ty=", moves[1])
 
@@ -164,105 +169,106 @@ const WumpusGameBoard = () => {
           }
 
           /*-------KILL WUMpuS---------*/
-          if(move==="A"){
+          if (move === "A") {
 
-          setScore(score-10)
+            setScore(score - 10)
+            setArrow(0)
 
-          if (moves[moves.length-1] === "R") {
-            newY = newY + 1;
-          }
-          else if (moves[moves.length-1] === "L") {
-            newY = newY - 1;
-          }
-          else if (moves[moves.length-1] === "U") {
-            newX = newX - 1;
-          }
-          else if (moves[moves.length-1] === "D") {
-            newX = newX + 1;
-          }
+            if (moves[moves.length - 1] === "R") {
+              newY = newY + 1;
+            }
+            else if (moves[moves.length - 1] === "L") {
+              newY = newY - 1;
+            }
+            else if (moves[moves.length - 1] === "U") {
+              newX = newX - 1;
+            }
+            else if (moves[moves.length - 1] === "D") {
+              newX = newX + 1;
+            }
 
 
-          if (board[newX][newY].includes('W')) {
-            console.log("Wumpus killed successfully")
+            if (board[newX][newY].includes('W')) {
+              console.log("Wumpus killed successfully")
 
-            // removing wumpus from the shooted cell
-            if (board[newX][newY] == "W") {
+              // removing wumpus from the shooted cell
+              if (board[newX][newY] == "W") {
                 board[newX][newY] = '';
-            }
-            else if (board[newX][newY] == "WS") {
+              }
+              else if (board[newX][newY] == "WS") {
                 board[newX][newY] = 'S';
-            }
-            else if (board[newX][newY] == 'WB') {
+              }
+              else if (board[newX][newY] == 'WB') {
                 board[newX][newY] = 'B';
-            }
-            else if (board[newX][newY] == 'WBS') {
+              }
+              else if (board[newX][newY] == 'WBS') {
                 board[newX][newY] = 'BS';
-            }
+              }
 
-            // removing stench from the adjacent cells
-            if (isValidCoordinate(newX - 1, newY)) {
+              // removing stench from the adjacent cells
+              if (isValidCoordinate(newX - 1, newY)) {
                 if (board[newX - 1][newY] == 'S') {
-                    board[newX - 1][newY] = '';
+                  board[newX - 1][newY] = '';
                 }
                 else if (board[newX - 1][newY] == 'BS') {
-                    board[newX - 1][newY] = 'B';
+                  board[newX - 1][newY] = 'B';
                 }
-                else if(board[newX - 1][newY] == 'GS'){
+                else if (board[newX - 1][newY] == 'GS') {
                   board[newX - 1][newY] = 'G';
                 }
-                else if(board[newX - 1][newY] == 'GBS'){
+                else if (board[newX - 1][newY] == 'GBS') {
                   board[newX - 1][newY] = 'GB';
                 }
-            }
-            if (isValidCoordinate(newX + 1, newY)) {
+              }
+              if (isValidCoordinate(newX + 1, newY)) {
                 if (board[newX + 1][newY] == 'S') {
-                    board[newX + 1][newY] = '';
+                  board[newX + 1][newY] = '';
                 }
                 else if (board[newX + 1][newY] == 'BS') {
-                    board[newX + 1][newY] = 'B';
-                }   
-                else if(board[newX + 1][newY] == 'GS'){
-                  board[newX +1][newY] = 'G';
+                  board[newX + 1][newY] = 'B';
                 }
-                else if(board[newX + 1][newY] == 'GBS'){
+                else if (board[newX + 1][newY] == 'GS') {
+                  board[newX + 1][newY] = 'G';
+                }
+                else if (board[newX + 1][newY] == 'GBS') {
                   board[newX + 1][newY] = 'GB';
-                }       
+                }
 
-            }
-            if (isValidCoordinate(newX, newY - 1) ) {
+              }
+              if (isValidCoordinate(newX, newY - 1)) {
                 if (board[newX][newY - 1] == 'S') {
-                    board[newX][newY - 1] = ''
+                  board[newX][newY - 1] = ''
                 }
                 else if (board[newX][newY - 1] == 'BS') {
-                    board[newX][newY - 1] = 'B'
+                  board[newX][newY - 1] = 'B'
                 }
-                else if(board[newX][newY-1] == 'GS'){
-                  board[newX][newY-1] = 'G';
+                else if (board[newX][newY - 1] == 'GS') {
+                  board[newX][newY - 1] = 'G';
                 }
-                else if(board[newX][newY-1] == 'GBS'){
-                  board[newX][newY-1] = 'GB';
+                else if (board[newX][newY - 1] == 'GBS') {
+                  board[newX][newY - 1] = 'GB';
                 }
-            }
-            if (isValidCoordinate(newX, newY + 1)) {
+              }
+              if (isValidCoordinate(newX, newY + 1)) {
                 if (board[newX][newY + 1] == 'S') {
-                    board[newX][newY + 1] = ''
+                  board[newX][newY + 1] = ''
                 }
                 else if (board[newX][newY + 1] == 'BS') {
-                    board[newX][newY + 1] = 'B'
+                  board[newX][newY + 1] = 'B'
                 }
-                else if(board[newX][newY+1] == 'GS'){
-                  board[newX][newY+1] = 'G';
+                else if (board[newX][newY + 1] == 'GS') {
+                  board[newX][newY + 1] = 'G';
                 }
-                else if(board[newX][newY+1] == 'GBS'){
-                  board[newX][newY+1] = 'GB';
+                else if (board[newX][newY + 1] == 'GBS') {
+                  board[newX][newY + 1] = 'GB';
                 }
+              }
+
+
             }
-
-
-        }
-          setAgentPosition(newX, newY)
-          break;
-        }
+            setAgentPosition(newX, newY)
+            break;
+          }
 
 
           //just checking....
@@ -283,15 +289,21 @@ const WumpusGameBoard = () => {
           }
 
           else if (board[newX][newY] === "G" || board[newX][newY] === "GS" || board[newX][newY] === "GB" || board[newX][newY] === "GBS") {
-            setGold(gold - 1)
-            let sc = score+10
-            setScore(sc)
+            console.log("******score: " + score);
+            setScore(score + 1000);
+            console.log("******score: " + score);
+            setGold(gold - 1);
+            if (gold === 0) {
+              setWin(true)
+            }
+
+
 
             // setGameOver(true)
             // console.log("You fell into a pit");
           }
 
-   
+
 
 
 
@@ -306,7 +318,8 @@ const WumpusGameBoard = () => {
             setVisitedCells([...visitedCells, agentPosition]);
             // console.log("x: " + newX + " y: " + newY);
             console.log("agent position: " + newX + " " + newY)
-            setScore(score-1)
+            // setScore(score - 1)
+            setMoveScore(moveScore - 1)
 
             updateUI(agentPosition.x, agentPosition.y);
             // setTimeout(() => {
@@ -373,6 +386,10 @@ const WumpusGameBoard = () => {
               ))}
             </tbody>
           </Table>
+          {move && (
+            <div>agent move : {move}
+            </div>
+          )}
         </div>
 
         <div className='container'>
@@ -418,7 +435,7 @@ const WumpusGameBoard = () => {
           <div className='menu_container'>
             <div className="">
               {/* <div className="breeze-icon" /> */}
-              <span>Score {score}</span>
+              <span>Score {score + moveScore}</span>
             </div>
 
             <div className="">
@@ -428,7 +445,7 @@ const WumpusGameBoard = () => {
 
             <div className="">
               {/* <div className="breeze-icon" /> */}
-              <span>Arrow</span>
+              <span>Arrow {arrow}</span>
             </div>
           </div>
         </div>
@@ -459,6 +476,10 @@ const WumpusGameBoard = () => {
           </div>
         </div>
       )}
+
+      {win && (<div>
+        You Won
+      </div>)}
 
 
 
