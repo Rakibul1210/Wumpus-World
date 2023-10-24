@@ -25,6 +25,4 @@ The Wumpus World is a classic AI problem where an agent must navigate through a 
 
 ## Acknowledgments
 
-We would like to express our gratitude to Dr. [Instructor's Name], Associate Professor at the Institute of Information Technology, University of Dhaka, for guiding us through this project and providing valuable insights.
-
-Feel free to customize this README.md file with additional project-specific details, instructions, or any other information relevant to your Wumpus World AI project.
+We would like to express our gratitude to Dr. Ahmedul Kabir, Associate Professor at the Institute of Information Technology, University of Dhaka, for guiding us through this project and providing valuable insights.
